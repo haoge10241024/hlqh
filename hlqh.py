@@ -6,16 +6,16 @@ import matplotlib.pyplot as plt
 import mplfinance as mpf
 
 # Streamlit 页面配置
-st.set_page_config(page_title="期货信息获取", layout="wide")
+st.set_page_config(page_title="Futures Information Retrieval", layout="wide")
 
 # 标题
-st.title("期货信息获取 -- created by 恒力期货上海分公司")
+st.title("Futures Information Retrieval -- created by 恒力期货上海分公司")
 
 # 获取期货新闻资讯
-st.header("期货资讯查询")
-news_commodity = st.selectbox("选择品种", ["全部", "要闻", "VIP", "财经", "铜", "铝", "铅", "锌", "镍", "锡", "贵金属", "小金属"])
-news_num = st.number_input("查看的新闻数量", min_value=1, max_value=100, value=10)
-if st.button("获取新闻资讯"):
+st.header("Futures News")
+news_commodity = st.selectbox("Select Commodity", ["全部", "要闻", "VIP", "财经", "铜", "铝", "铅", "锌", "镍", "锡", "贵金属", "小金属"])
+news_num = st.number_input("Number of News to Display", min_value=1, max_value=100, value=10)
+if st.button("Retrieve News"):
     try:
         news_df = ak.futures_news_shmet(symbol=news_commodity)
         news_df = news_df.tail(news_num)
@@ -24,11 +24,11 @@ if st.button("获取新闻资讯"):
         st.error(f"Error fetching news data for {news_commodity}: {e}")
 
 # 获取期限结构图
-st.header("期限结构图")
-structure_commodity = st.text_input("输入品种名称（例如：沪铜）", value="沪铜", key="structure_commodity")
-structure_days = st.number_input("查看的天数(建议30日以内)", min_value=1, max_value=30, value=30)
-if st.button("获取期限结构图"):
-    output_filename = f"{structure_commodity}_期限结构图.png"
+st.header("Term Structure Chart")
+structure_commodity = st.text_input("Enter Commodity Name (e.g., SHFE Copper)", value="SHFE Copper", key="structure_commodity")
+structure_days = st.number_input("Number of Days to View (Recommended within 30 days)", min_value=1, max_value=30, value=30)
+if st.button("Retrieve Term Structure Chart"):
+    output_filename = f"{structure_commodity}_term_structure.png"
     try:
         def fetch_and_plot_futures_data(commodity_name, output_filename):
             continuous_contracts = [
@@ -103,17 +103,17 @@ if st.button("获取期限结构图"):
         st.error(f"Error generating futures structure chart: {e}")
 
 # 获取期货库存
-st.header("期货库存查询")
-inventory_commodity = st.text_input("输入品种名称（例如：沪铜）", value="沪铜", key="inventory_commodity")
-if st.button("获取期货库存"):
+st.header("Futures Inventory")
+inventory_commodity = st.text_input("Enter Commodity Name (e.g., SHFE Copper)", value="SHFE Copper", key="inventory_commodity")
+if st.button("Retrieve Futures Inventory"):
     try:
         inventory_df = ak.futures_inventory_em(symbol=inventory_commodity)
         st.write(inventory_df)
         fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(inventory_df['日期'], inventory_df['库存'], marker='o')
-        ax.set_title(f'{inventory_commodity} 库存情况')
-        ax.set_xlabel('日期')
-        ax.set_ylabel('库存')
+        ax.plot(inventory_df['date'], inventory_df['inventory'], marker='o')
+        ax.set_title(f'{inventory_commodity} Inventory')
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Inventory')
         plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(fig)
@@ -121,11 +121,11 @@ if st.button("获取期货库存"):
         st.error(f"Error fetching inventory data for {inventory_commodity}: {e}")
 
 # 获取基差情况
-st.header("基差情况查询")
-basis_commodity = st.text_input("输入品种代码（例如：CU）", value="CU", key="basis_commodity")
-basis_start_date = st.date_input("起始日期", datetime.now() - timedelta(days=30))
-basis_end_date = st.date_input("结束日期", datetime.now())
-if st.button("获取基差情况"):
+st.header("Basis Situation")
+basis_commodity = st.text_input("Enter Commodity Code (e.g., CU)", value="CU", key="basis_commodity")
+basis_start_date = st.date_input("Start Date", datetime.now() - timedelta(days=30))
+basis_end_date = st.date_input("End Date", datetime.now())
+if st.button("Retrieve Basis Situation"):
     try:
         basis_df = ak.futures_spot_price_daily(
             start_day=basis_start_date.strftime("%Y%m%d"), 
@@ -133,15 +133,15 @@ if st.button("获取基差情况"):
             vars_list=[basis_commodity]
         )
         if basis_df.empty:
-            st.warning("没有找到相关数据，请检查输入的日期范围和品种是否正确。")
+            st.warning("No data found, please check the date range and commodity.")
         else:
             st.write(basis_df)
             fig, ax = plt.subplots(figsize=(10, 6))
-            ax.plot(basis_df['date'], basis_df['spot_price'], marker='o', label='现货价')
-            ax.plot(basis_df['date'], basis_df['dominant_contract_price'], marker='o', label='主力期货价')
-            ax.set_title(f'{basis_commodity} 基差情况')
-            ax.set_xlabel('日期')
-            ax.set_ylabel('价格')
+            ax.plot(basis_df['date'], basis_df['spot_price'], marker='o', label='Spot Price')
+            ax.plot(basis_df['date'], basis_df['dominant_contract_price'], marker='o', label='Main Futures Price')
+            ax.set_title(f'{basis_commodity} Basis Situation')
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Price')
             ax.legend()
             plt.xticks(rotation=45)
             plt.tight_layout()
@@ -150,22 +150,21 @@ if st.button("获取基差情况"):
         st.error(f"Error fetching basis data: {e}")
 
 # 获取K线图
-st.header("K线图")
-kline_commodity = st.text_input("输入品种合约代码（例如：CU0）", value="CU0", key="kline_commodity")
-kline_start_date = st.date_input("K线图起始日期", datetime.now() - timedelta(days=30))
-kline_end_date = st.date_input("K线图结束日期", datetime.now())
-if st.button("获取K线图"):
+st.header("K-line Chart")
+kline_commodity = st.text_input("Enter Commodity Contract Code (e.g., CU0)", value="CU0", key="kline_commodity")
+kline_start_date = st.date_input("Start Date", datetime.now() - timedelta(days=30))
+kline_end_date = st.date_input("End Date", datetime.now())
+if st.button("Retrieve K-line Chart"):
     try:
         kline_data = ak.futures_main_sina(symbol=kline_commodity, start_date=kline_start_date.strftime("%Y%m%d"), end_date=kline_end_date.strftime("%Y%m%d"))
         if kline_data.empty:
-            st.warning("没有找到相关数据，请检查输入的日期范围和品种是否正确。")
+            st.warning("No data found, please check the date range and commodity.")
         else:
-            kline_data.rename(columns={'date': '日期', 'open': '开盘价', 'high': '最高价', 'low': '最低价', 'close': '收盘价', 'volume': '成交量'}, inplace=True)
-            kline_data['日期'] = pd.to_datetime(kline_data['日期'])
-            kline_data.set_index('日期', inplace=True)
-            kline_data.rename(columns={'开盘价': 'Open', '最高价': 'High', '最低价': 'Low', '收盘价': 'Close', '成交量': 'Volume'}, inplace=True)
-            kline_chart_path = f"{kline_commodity}_k线图.png"
-            mpf.plot(kline_data, type='candle', volume=True, style='charles', title=f'{kline_commodity} K线图', savefig=kline_chart_path)
+            kline_data.rename(columns={'date': 'Date', 'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
+            kline_data['Date'] = pd.to_datetime(kline_data['Date'])
+            kline_data.set_index('Date', inplace=True)
+            kline_chart_path = f"{kline_commodity}_kline_chart.png"
+            mpf.plot(kline_data, type='candle', volume=True, style='charles', title=f'{kline_commodity} K-line Chart', savefig=kline_chart_path)
             st.image(kline_chart_path)
     except KeyError as e:
         st.error(f"Error fetching or plotting K-line data for {kline_commodity}: {e}")
