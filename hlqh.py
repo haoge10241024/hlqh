@@ -68,7 +68,7 @@ if st.button("获取期限结构图"):
                 st.error(f"Error fetching realtime data for {commodity_name}: {e}")
                 return
 
-            all_symbols are sorted(set(all_symbols))
+            all_symbols = sorted(set(all_symbols))
 
             symbol_close_prices = {}
 
