@@ -13,16 +13,19 @@ st.title("期货信息获取 -- created by 恒力期货上海分公司")
 
 # 获取期货新闻资讯
 st.header("期货资讯查询")
-news_commodity = st.text_input("输入品种名称（例如：沪铜）", value="沪铜")
+news_commodity = st.text_input("输入品种名称（例如：铜）", value="铜")
 news_num = st.number_input("查看的新闻数量", min_value=1, max_value=100, value=10)
 if st.button("获取新闻资讯"):
-    news_df = ak.futures_news_shmet(symbol=news_commodity)
-    news_df = news_df.tail(news_num)
-    st.write(news_df)
+    try:
+        news_df = ak.futures_news_shmet(symbol=news_commodity)
+        news_df = news_df.tail(news_num)
+        st.write(news_df)
+    except KeyError as e:
+        st.error(f"Error fetching news data for {news_commodity}: {e}")
 
 # 获取期限结构图
 st.header("期限结构图")
-structure_commodity = st.text_input("输入品种名称（例如：沪铜）", value="沪铜", key="structure_commodity")
+structure_commodity = st.text_input("输入品种名称（例如：铜）", value="铜", key="structure_commodity")
 structure_days = st.number_input("查看的天数(建议30日以内)", min_value=1, max_value=30, value=30)
 if st.button("获取期限结构图"):
     output_filename = f"{structure_commodity}_期限结构图.png"
@@ -54,7 +57,7 @@ if st.button("获取期限结构图"):
             symbol_close_prices = {}
 
             end_date = datetime.now()
-            start_date = end_date - timedelta(days=30)  # 获取数据的天数
+            start_date = end_date - timedelta(days=structure_days)  # 获取数据的天数
 
             for symbol in all_symbols:
                 try:
@@ -106,6 +109,14 @@ if st.button("获取期货库存"):
     try:
         inventory_df = ak.futures_inventory_em(symbol=inventory_commodity)
         st.write(inventory_df)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.plot(inventory_df['日期'], inventory_df['库存'], marker='o')
+        ax.set_title(f'{inventory_commodity} 库存情况')
+        ax.set_xlabel('日期')
+        ax.set_ylabel('库存')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        st.pyplot(fig)
     except KeyError as e:
         st.error(f"Error fetching inventory data for {inventory_commodity}: {e}")
 
@@ -125,6 +136,14 @@ if st.button("获取基差情况"):
             st.warning("没有找到相关数据，请检查输入的日期范围和品种是否正确。")
         else:
             st.write(basis_df)
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(basis_df['date'], basis_df['near_basis'], marker='o')
+            ax.set_title(f'{basis_commodity} 基差情况')
+            ax.set_xlabel('日期')
+            ax.set_ylabel('基差')
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            st.pyplot(fig)
     except Exception as e:
         st.error(f"Error fetching basis data: {e}")
 
@@ -145,6 +164,7 @@ if st.button("获取K线图"):
             kline_chart_path = f"{kline_commodity}_k线图.png"
             mpf.plot(kline_data, type='candle', volume=True, style='charles', title=f'{kline_commodity} K线图', savefig=kline_chart_path)
             st.image(kline_chart_path)
-    except ValueError as e:
+    except KeyError as e:
         st.error(f"Error fetching or plotting K-line data for {kline_commodity}: {e}")
+
 
