@@ -160,6 +160,7 @@ if st.button("获取K线图"):
         if kline_data.empty:
             st.warning("没有找到相关数据，请检查输入的日期范围和品种是否正确。")
         else:
+            st.write(f"列名: {kline_data.columns.tolist()}")  # 打印列名以进行调试
             kline_data.rename(columns={'date': 'Date', 'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
             kline_data['Date'] = pd.to_datetime(kline_data['Date'])
             kline_data.set_index('Date', inplace=True)
@@ -168,3 +169,5 @@ if st.button("获取K线图"):
             st.image(kline_chart_path)
     except KeyError as e:
         st.error(f"Error fetching or plotting K-line data for {kline_commodity}: {e}")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
