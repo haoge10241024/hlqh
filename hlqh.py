@@ -13,7 +13,7 @@ st.title("期货信息获取 -- created by 恒力期货上海分公司")
 
 # 获取期货新闻资讯
 st.header("期货资讯查询")
-news_commodity = st.text_input("输入品种名称（例如：铜）", value="铜")
+news_commodity = st.selectbox("选择品种", ["全部", "要闻", "VIP", "财经", "铜", "铝", "铅", "锌", "镍", "锡", "贵金属", "小金属"])
 news_num = st.number_input("查看的新闻数量", min_value=1, max_value=100, value=10)
 if st.button("获取新闻资讯"):
     try:
@@ -25,7 +25,7 @@ if st.button("获取新闻资讯"):
 
 # 获取期限结构图
 st.header("期限结构图")
-structure_commodity = st.text_input("输入品种名称（例如：铜）", value="铜", key="structure_commodity")
+structure_commodity = st.text_input("输入品种名称（例如：沪铜）", value="沪铜", key="structure_commodity")
 structure_days = st.number_input("查看的天数(建议30日以内)", min_value=1, max_value=30, value=30)
 if st.button("获取期限结构图"):
     output_filename = f"{structure_commodity}_期限结构图.png"
@@ -137,10 +137,12 @@ if st.button("获取基差情况"):
         else:
             st.write(basis_df)
             fig, ax = plt.subplots(figsize=(10, 6))
-            ax.plot(basis_df['date'], basis_df['near_basis'], marker='o')
+            ax.plot(basis_df['date'], basis_df['spot_price'], marker='o', label='现货价')
+            ax.plot(basis_df['date'], basis_df['dominant_contract_price'], marker='o', label='主力期货价')
             ax.set_title(f'{basis_commodity} 基差情况')
             ax.set_xlabel('日期')
-            ax.set_ylabel('基差')
+            ax.set_ylabel('价格')
+            ax.legend()
             plt.xticks(rotation=45)
             plt.tight_layout()
             st.pyplot(fig)
@@ -166,5 +168,3 @@ if st.button("获取K线图"):
             st.image(kline_chart_path)
     except KeyError as e:
         st.error(f"Error fetching or plotting K-line data for {kline_commodity}: {e}")
-
-
