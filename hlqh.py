@@ -124,9 +124,10 @@ inventory_commodity = st.text_input("输入品种名称（例如：沪铜）", v
 if st.button("获取期货库存"):
     try:
         inventory_df = ak.futures_inventory_em(symbol=inventory_commodity)
+        inventory_df.rename(columns={'日期': 'Date', '库存': 'Inventory', '增减': 'Change'}, inplace=True)
         st.write(inventory_df)
         fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(inventory_df['date'], inventory_df['inventory'], marker='o')
+        ax.plot(inventory_df['Date'], inventory_df['Inventory'], marker='o')
         ax.set_title(f'{inventory_commodity} Inventory')
         ax.set_xlabel('Date')
         ax.set_ylabel('Inventory')
