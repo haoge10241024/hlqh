@@ -177,7 +177,9 @@ if st.button("获取K线图"):
             st.warning("没有找到相关数据，请检查输入的日期范围和品种是否正确。")
         else:
             st.write(f"列名: {kline_data.columns.tolist()}")  # 打印列名以进行调试
-            kline_data.rename(columns={'date': 'Date', 'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
+            kline_data.rename(columns={
+                '日期': 'Date', '开盘价': 'Open', '最高价': 'High', '最低价': 'Low', '收盘价': 'Close', '成交量': 'Volume'
+            }, inplace=True)
             kline_data['Date'] = pd.to_datetime(kline_data['Date'])
             kline_data.set_index('Date', inplace=True)
             kline_chart_path = f"{kline_commodity}_kline_chart.png"
