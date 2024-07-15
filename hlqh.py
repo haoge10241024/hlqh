@@ -160,9 +160,10 @@ if st.button("获取K线图"):
         if kline_data.empty:
             st.warning("没有找到相关数据，请检查输入的日期范围和品种是否正确。")
         else:
-            kline_data['date'] = pd.to_datetime(kline_data['date'])
-            kline_data.set_index('date', inplace=True)
-            kline_data.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}, inplace=True)
+            kline_data.rename(columns={'date': '日期', 'open': '开盘价', 'high': '最高价', 'low': '最低价', 'close': '收盘价', 'volume': '成交量'}, inplace=True)
+            kline_data['日期'] = pd.to_datetime(kline_data['日期'])
+            kline_data.set_index('日期', inplace=True)
+            kline_data.rename(columns={'开盘价': 'Open', '最高价': 'High', '最低价': 'Low', '收盘价': 'Close', '成交量': 'Volume'}, inplace=True)
             kline_chart_path = f"{kline_commodity}_k线图.png"
             mpf.plot(kline_data, type='candle', volume=True, style='charles', title=f'{kline_commodity} K线图', savefig=kline_chart_path)
             st.image(kline_chart_path)
