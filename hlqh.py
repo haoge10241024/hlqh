@@ -14,7 +14,7 @@ st.title("Futures Information Retrieval -- created by 恒力期货上海分公�
 # 获取期货新闻资讯
 st.header("Futures News")
 news_commodity = st.selectbox("Select Commodity", ["全部", "要闻", "VIP", "财经", "铜", "铝", "铅", "锌", "镍", "锡", "贵金属", "小金属"])
-news_num = st.number_input("Number of News to Display", min_value=1, max_value=100, value=10)
+news_num = st.number_input("Number of News to Display", min_value=1, max_value=100, value=10, key="news_num")
 if st.button("Retrieve News"):
     try:
         news_df = ak.futures_news_shmet(symbol=news_commodity)
@@ -26,7 +26,7 @@ if st.button("Retrieve News"):
 # 获取期限结构图
 st.header("Term Structure Chart")
 structure_commodity = st.text_input("Enter Commodity Name (e.g., SHFE Copper)", value="SHFE Copper", key="structure_commodity")
-structure_days = st.number_input("Number of Days to View (Recommended within 30 days)", min_value=1, max_value=30, value=30)
+structure_days = st.number_input("Number of Days to View (Recommended within 30 days)", min_value=1, max_value=30, value=30, key="structure_days")
 if st.button("Retrieve Term Structure Chart"):
     output_filename = f"{structure_commodity}_term_structure.png"
     try:
@@ -123,8 +123,8 @@ if st.button("Retrieve Futures Inventory"):
 # 获取基差情况
 st.header("Basis Situation")
 basis_commodity = st.text_input("Enter Commodity Code (e.g., CU)", value="CU", key="basis_commodity")
-basis_start_date = st.date_input("Start Date", datetime.now() - timedelta(days=30))
-basis_end_date = st.date_input("End Date", datetime.now())
+basis_start_date = st.date_input("Start Date", datetime.now() - timedelta(days=30), key="basis_start_date")
+basis_end_date = st.date_input("End Date", datetime.now(), key="basis_end_date")
 if st.button("Retrieve Basis Situation"):
     try:
         basis_df = ak.futures_spot_price_daily(
@@ -152,8 +152,8 @@ if st.button("Retrieve Basis Situation"):
 # 获取K线图
 st.header("K-line Chart")
 kline_commodity = st.text_input("Enter Commodity Contract Code (e.g., CU0)", value="CU0", key="kline_commodity")
-kline_start_date = st.date_input("Start Date", datetime.now() - timedelta(days=30))
-kline_end_date = st.date_input("End Date", datetime.now())
+kline_start_date = st.date_input("K-line Start Date", datetime.now() - timedelta(days=30), key="kline_start_date")
+kline_end_date = st.date_input("K-line End Date", datetime.now(), key="kline_end_date")
 if st.button("Retrieve K-line Chart"):
     try:
         kline_data = ak.futures_main_sina(symbol=kline_commodity, start_date=kline_start_date.strftime("%Y%m%d"), end_date=kline_end_date.strftime("%Y%m%d"))
