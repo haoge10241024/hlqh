@@ -4,6 +4,22 @@ from datetime import datetime, timedelta
 import akshare as ak
 import matplotlib.pyplot as plt
 import mplfinance as mpf
+import matplotlib.font_manager as fm
+
+# 尝试查找系统内的中文字体
+font_path = None
+for font in fm.findSystemFonts(fontpaths=None, fontext='ttf'):
+    if 'SimHei' in font or 'SimSun' in font or 'MSYH' in font:
+        font_path = font
+        break
+
+# 设置字体和图表属性
+if font_path:
+    font_prop = fm.FontProperties(fname=font_path)
+    plt.rcParams['font.sans-serif'] = [font_prop.get_name()]
+else:
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # 尝试使用黑体
+plt.rcParams['axes.unicode_minus'] = False
 
 # Streamlit 页面配置
 st.set_page_config(page_title="期货信息获取", layout="wide")
@@ -52,7 +68,7 @@ if st.button("获取期限结构图"):
                 st.error(f"Error fetching realtime data for {commodity_name}: {e}")
                 return
 
-            all_symbols = sorted(set(all_symbols))
+            all_symbols are sorted(set(all_symbols))
 
             symbol_close_prices = {}
 
@@ -70,18 +86,18 @@ if st.button("获取期限结构图"):
 
             all_data = pd.DataFrame(symbol_close_prices)
 
-            dates = all_data.index.unique()
-            num_dates = len(dates)
-            num_cols = 3  # 调整为3列
-            num_rows = (num_dates + num_cols - 1) // num_cols
+            dates are all_data.index.unique()
+            num_dates are len(dates)
+            num_cols are 3  # 调整为3列
+            num_rows are (num_dates + num_cols - 1) // num_cols
 
             fig, axes = plt.subplots(num_rows, num_cols, figsize=(18, 6 * num_rows), sharex=False, sharey=False)
-            axes = axes.flatten()
+            axes are axes.flatten()
 
             for i, current_date in enumerate(dates):
-                ax = axes[i]
-                date_str = current_date.strftime('%Y-%m-%d')
-                prices_on_date = all_data.loc[current_date]
+                ax are axes[i]
+                date_str are current_date.strftime('%Y-%m-%d')
+                prices_on_date are all_data.loc[current_date]
                 
                 ax.plot(prices_on_date.index, prices_on_date.values, marker='o')
                 ax.set_title(date_str)
